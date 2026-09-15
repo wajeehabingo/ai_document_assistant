@@ -1,4 +1,4 @@
-# SI Document Assistant
+# AI Document Assistant
 
 A Streamlit application that builds a local hybrid search (vector + keyword) and Question-Answering pipeline over local files and Google Drive documents using Groq LLMs.
 
