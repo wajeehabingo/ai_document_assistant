@@ -233,7 +233,7 @@ def hybrid_search(query, chunks, faiss_index, top_k=4, alpha=0.6):
 st.markdown("""
 <div class="header-card">
     <h1>🤖 AI Document Assistant</h1>
-    <p>Hybrid Semantic Search & Context-Aware QA Engine powered by openai/gpt-oss-120b</p>
+    <p>Hybrid Search Engine powered by Groq & openai/gpt-oss-120b</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -318,14 +318,13 @@ with tab1:
                 [f"[Source: {c['filename']}, Page: {c['page']}]\n{c['text']}" for c in retrieved_chunks]
             )
 
-            if "OPENAI_API_KEY" not in st.secrets:
-                st.error("Missing `OPENAI_API_KEY` in `.streamlit/secrets.toml` configuration.")
+            if "GROQ_API_KEY" not in st.secrets:
+                st.error("Missing `GROQ_API_KEY` in `.streamlit/secrets.toml` configuration.")
             else:
-                # Support custom base_url if defined in secrets, otherwise default to standard
-                base_url = st.secrets.get("OPENAI_BASE_URL", None)
+                # Use OpenAI SDK pointing to Groq's API endpoint with GROQ_API_KEY
                 client = OpenAI(
-                    api_key=st.secrets["OPENAI_API_KEY"],
-                    base_url=base_url
+                    api_key=st.secrets["GROQ_API_KEY"],
+                    base_url="https://api.groq.com/openai/v1"
                 )
                 
                 prompt = f"""You are an expert document assistant. Answer the user's question using ONLY the context provided below.
@@ -374,6 +373,7 @@ with tab3:
         "Embedding Model": "SentenceTransformers (all-MiniLM-L6-v2)",
         "Vector Database": "FAISS (IndexFlatIP)",
         "Search Strategy": "Hybrid (Cosine Vector Sim + Keyword Matching)",
+        "LLM Provider": "Groq API (OpenAI Compatible Endpoint)",
         "LLM Model": "openai/gpt-oss-120b",
         "Ingested Chunks": len(st.session_state.chunks) if st.session_state.processed else 0
     })
