@@ -23,19 +23,16 @@ st.set_page_config(
 # Custom Bluish-Greenish (Teal/Emerald/Dark) Styling
 st.markdown("""
 <style>
-    /* Main Background & Fonts */
     .stApp {
         background-color: #0b131e;
         color: #e2e8f0;
     }
     
-    /* Headers & Branding */
     h1, h2, h3, h4 {
         color: #2dd4bf !important;
         font-weight: 700 !important;
     }
     
-    /* Custom Gradient Card Header */
     .header-card {
         background: linear-gradient(135deg, #0f766e 0%, #1e3a8a 100%);
         padding: 24px;
@@ -55,7 +52,6 @@ st.markdown("""
         font-size: 1.05rem;
     }
 
-    /* Navigation Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
         background-color: #111827;
@@ -76,7 +72,6 @@ st.markdown("""
         color: #ffffff !important;
     }
 
-    /* Buttons */
     .stButton>button {
         background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
         color: white;
@@ -93,13 +88,11 @@ st.markdown("""
         color: #ffffff;
     }
 
-    /* Sidebar Styling */
     section[data-testid="stSidebar"] {
         background-color: #0f172a;
         border-right: 1px solid #1e293b;
     }
 
-    /* Source Expander Styling */
     .stExpander {
         background-color: #111827;
         border: 1px solid #1f2937 !important;
@@ -107,7 +100,6 @@ st.markdown("""
         margin-bottom: 10px;
     }
     
-    /* Input Fields */
     .stTextInput input {
         background-color: #1e293b !important;
         color: #f8fafc !important;
@@ -241,7 +233,7 @@ def hybrid_search(query, chunks, faiss_index, top_k=4, alpha=0.6):
 st.markdown("""
 <div class="header-card">
     <h1>🤖 AI Document Assistant</h1>
-    <p>Hybrid Semantic Search & Context-Aware QA Engine for PDF, DOCX, TXT, MD & Google Drive</p>
+    <p>Hybrid Semantic Search & Context-Aware QA Engine powered by openai/gpt-oss-120b</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -329,7 +321,12 @@ with tab1:
             if "OPENAI_API_KEY" not in st.secrets:
                 st.error("Missing `OPENAI_API_KEY` in `.streamlit/secrets.toml` configuration.")
             else:
-                client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+                # Support custom base_url if defined in secrets, otherwise default to standard
+                base_url = st.secrets.get("OPENAI_BASE_URL", None)
+                client = OpenAI(
+                    api_key=st.secrets["OPENAI_API_KEY"],
+                    base_url=base_url
+                )
                 
                 prompt = f"""You are an expert document assistant. Answer the user's question using ONLY the context provided below.
 If the information cannot be found in the context, state "Information not available in the provided context."
@@ -377,6 +374,6 @@ with tab3:
         "Embedding Model": "SentenceTransformers (all-MiniLM-L6-v2)",
         "Vector Database": "FAISS (IndexFlatIP)",
         "Search Strategy": "Hybrid (Cosine Vector Sim + Keyword Matching)",
-        "LLM Provider": "openai/gpt-oss-120b",
+        "LLM Model": "openai/gpt-oss-120b",
         "Ingested Chunks": len(st.session_state.chunks) if st.session_state.processed else 0
     })
